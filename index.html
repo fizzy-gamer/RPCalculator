@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RP Calculator</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="https://static.wikitide.net/industrialistwiki/d/d0/Icon-rp.png" />
+    <meta property="og:title" content="RP Calculator" />
+    <meta property="og:description" content="RP calculator app for Industrialist Roblox."/>
+    <meta property="og:site_name" content="GitHub Pages" />
+    <meta property="og:image" content="https://static.wikitide.net/industrialistwiki/d/d0/Icon-rp.png"/>
+    <link href="https://fonts.googleapis.com/css?family=Fredoka One" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="./src/style.css" />
+    <script type="module" src="./src/script.js"></script>
+  </head>
+  
+  <div class="Title">
+    <img src="https://static.wikitide.net/industrialistwiki/d/d0/Icon-rp.png">
+  </div>
+
+  <div class="Rates">
+    <div class="ResearchStation">
+      <div class="RatesText">
+        <h2>⚠️<u class="GreyText"> Set RP </u>⚠️</h2>
+        <input id="CurrentRPAmount" class="AmountInput" placeholder="Current RP" type="number" step="1" min="0">
+        <input id="TargetRPAmount"  class="AmountInput" placeholder="Target RP"  type="number" step="1" min="0">
+      </div>
+    </div>
+
+    <div class="ResearchStation">
+      <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/a/a8/Research_Station2.png">
+      <div class="RatesText">
+        <h2>⚙️<u class="GreyText"> Research Station2 Rates </u>⚙️</h2>
+        <input id="RS2Amount"  class="AmountInput" placeholder="Research Stations" type="number" step="1" min="0">
+        <div class="RateTexts" id="RS2BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS2CurrentRPs"></div>
+        <div class="RateTexts" id="RS2RPCap"></div>
+        <div class="RateTexts" id="RS2HighestRP"></div>
+        <div class="RateTexts" id="RS2HighestRPTime"></div>
+        <div class="RateTexts" id="RS2TargetRPTime"></div>
+        <div class="RateTexts" id="RS2Usage"></div>
+      </div>
+    </div>
+
+    <div class="ResearchStation">
+      <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/4/4a/Research_Station3.png">
+      <div class="RatesText">
+        <h2>⚙️<u class="GreyText"> Research Station3 Rates </u>⚙️</h2>
+        <input id="RS3Amount" class="AmountInput" placeholder="Research Stations" type="number" step="1" min="0">
+        <div class="RateTexts" id="RS3BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS3CurrentRPs"></div>
+        <div class="RateTexts" id="RS3RPCap"></div>
+        <div class="RateTexts" id="RS3HighestRP"></div>
+        <div class="RateTexts" id="RS3HighestRPTime"></div>
+        <div class="RateTexts" id="RS3TargetRPTime"></div>
+        <div class="RateTexts" id="RS3Usage"></div>
+        <div class="RedText"  id="RS3DoubleItems"></div>
+      </div>
+    </div>
+
+    <div class="ResearchStation">
+      <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/f/f4/Research_Station4.png">
+      <div class="RatesText">
+        <h2>⚙️<u class="GreyText"> Research Station4 Rates </u>⚙️</h2>
+        <input id="RS4Amount"  class="AmountInput" placeholder="Research Stations" type="number" step="1" min="0">
+        <div class="RateTexts" id="RS4BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS4BuffRPs"></div>
+        <div class="RateTexts" id="RS4CurrentRPs"></div>
+        <div class="RateTexts" id="RS4RPCap"></div>
+        <div class="RateTexts" id="RS4HighestRP"></div>
+        <div class="RateTexts" id="RS4HighestRPTime"></div>
+        <div class="RateTexts" id="RS4TargetRPTime"></div>
+        <div class="RateTexts" id="RS4Usage"></div>
+        <div class="RedText">RS4 is calculated as if it already has an RS3!</div>
+        <div class="RedText">RS4 RP/s logic buff assumes the circuit runs every tick!</div>
+      </div>
+    </div>
+    
+    <div class="ResearchStation">
+      <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/b/b8/Satellite_Dish_Controller.png">
+      <div class="RatesText">
+        <h2>⚙️<u class="GreyText"> Satelite Controller Rates </u>⚙️</h2>
+        <input id="SatelliteControllerAmount" class="AmountInput" placeholder="Satelite Controllers" type="number" step="1" min="0">
+        <div class="RateTexts"  id="SatelliteRPsBoost">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts"  id="SatelliteHighestRP"></div>
+        <div class="RateTexts"  id="SatelliteHighestRPTime"></div>
+        <div class="RateTexts"  id="SatelliteTargetRPTime"></div>
+        <div class="RateTexts"  id="SatelliteDishesRequired"></div>
+        <div class="OrangeText" id="SatelliteSatelliteUsage"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="Menu">
+    <h2><u class="MoneyText">Select Items</u></h2>
+    <p id="ItemAmountSelected" class="OrangeText">0 Selected</p>
+    <p id="ItemSelected" class="GreyText">Selected:</p>
+    <div class="OptionButtons">
+      <button  class="SelectionEnabled"  id="DeselectAllItemButton">Deselect</button>
+      <button  class="SelectionDisabled" id="RS2Mode">RS2 Item</button>
+      <button  class="SelectionDisabled" id="RS3Mode">RS3/4 Items</button>
+      <button  class="SelectionDisabled" id="RS3BothMode">RS3/4 Item Both</button>
+    </div>
+    <div class="Buttons" id="ItemButtons"></div>
+  </div>
+
+  <div class="Menu">
+    <h2><u class="MoneyText">Select Fluid</u></h2>
+    <p id="FluidAmountSelected" class="OrangeText">0 Selected</p>
+    <p id="FluidSelected" class="GreyText">Selected:</p>
+    <div class="OptionButtons">
+      <button class="SelectionEnabled" id="DeselectAllFluidButton">Deselect</button>
+    </div>
+    <div class="Buttons" id="FluidButtons"></div>
+  </div>
+  </body>
+  
+  <p class="Footer">
+    <a href="https://github.com/fizzy-gamer/RPCalculator">Source Code</a>
+    <span class="GreyText">• Calculator made by</span>
+    <a href="https://github.com/fizzy-gamer">@fizzygamer</a>
+  </p>
+</html>
