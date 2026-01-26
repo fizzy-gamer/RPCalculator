@@ -1,0 +1,180 @@
+html {
+  min-height: 100vh;
+  background-color: #00779b;
+  color: black;
+  overflow-x: hidden;
+  font-family: "Fredoka One";
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 600px) {
+  .settings {
+    min-width: fit-content;
+    padding: 2% 10%;
+  }
+  .footer {
+    font-size: 14px;
+  }
+  h1 {
+    font-size: 5vw;
+  }
+}
+
+.Title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  filter: drop-shadow(0 0 6px rgba(235, 219, 178, 0.33));
+}
+.Title img {
+  max-height: 250px;
+  max-width: 250px;
+}
+
+.Menu,
+.ResearchStation {
+  background: rgba(50, 50, 50, 0.35);
+  margin: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  border-radius: 16px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  min-width: 75%;
+}
+.ResearchStation {
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  text-align: center;
+  gap: 20px;
+  min-width: 30%;
+}
+.OptionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 16px;
+  margin-top: 0px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.SelectionEnabled,
+.SelectionDisabled {
+  font-family: "Fredoka One";
+  margin: 5px;
+  border-radius: 25px;
+  background-color: #75d4f1;
+  border-color: black;
+  border-style: solid;
+}
+.SelectionDisabled {
+  background-color: #196981;
+}
+
+.Buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(64px, 128px));
+  gap: 5px;
+  width: 100%;
+  justify-content: space-evenly;
+}
+.DeselectedButton,
+.SelectedButton {
+  height: 128px;
+  width: 128px;
+  font-family: "Fredoka One";
+  margin: 5px;
+  border-radius: 25px;
+  background-image: linear-gradient(to bottom,#313131,#1e1e1e);
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  border-style: solid;
+}
+.DeselectedButton {
+  border-color: red;
+}
+.SelectedButton {
+  border-color: lime;
+}
+.ItemIcon {
+  width: auto;
+  max-width: 64px;
+  height: auto;
+  max-height: 64px;
+}
+
+.ResearchStationImage {
+  width: fit-content;
+  max-width: 300px;
+  height: fit-content;
+  max-height: 260px;
+}
+.AmountInput {
+  font-family: "Fredoka One";
+  width: fit-content;
+  min-width: 50%;
+  margin: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-color: black;
+  border-style: solid;
+  border-radius: 10px;
+  color:rgb(175, 175, 175);
+}
+.RateTexts {
+  margin: 5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ItemText {
+  font-size: 90%;
+  color:grey;
+}
+
+.RPText{background:linear-gradient(to bottom,#00ffff,#009999);}
+.OrangeText{background:linear-gradient(to bottom,#ffa500,#b37400);}
+.RedText{background:linear-gradient(to bottom,#ff3c00,#d43200);}
+.MoneyText{background:linear-gradient(to bottom,#00ff00,#008f00);}
+.GreyText{background:linear-gradient(to bottom,#3d3d3d,#141414);}
+.RPText,.OrangeText,.RedText,.MoneyText,.GreyText{
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.Footer {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  min-height: 25px;
+  background: rgba(0, 0, 0, 0.35);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  font-family: "Fredoka One";
+  position: relative;
+  color: black;
+  border-radius: 5px;
+  font-size: 90%;
+}
+.Footer a {
+  color: #519da1;
+}
+.Footer span {
+  margin-left: 5px;
+  margin-right: 5px;
+}
