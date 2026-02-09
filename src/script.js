@@ -286,9 +286,9 @@ function CalculateSatellite(RPValue, Controllers) {
   SatelliteStats["TotalRPValue"] = RPValue*Controllers;
   SatelliteStats["DishesRequired"] = Math.sqrt(SatelliteStats["TotalRPValue"]*Controllers)+Controllers;
   SatelliteStats["SatelliteUsage"] = Controllers*0.5;
-  SatelliteStats["PercentBoost"] = (0.78 * CustomLog(SatelliteStats["TotalRPValue"]+1,10) * 100)-100;
-  SatelliteStats["BaseRPsBoost"] = (RS2Stats["BaseRPs"] + RS3Stats["BaseRPs"] + RS4Stats["BaseRPs"]) * ((SatelliteStats["PercentBoost"]+100)/100);
-  SatelliteStats["RPsBoost"] = (RS2Stats["CurrentRPs"] + RS3Stats["CurrentRPs"] + RS4Stats["CurrentRPs"]) * ((SatelliteStats["PercentBoost"]+100)/100);
+  SatelliteStats["PercentBoost"] = (0.78 * CustomLog(SatelliteStats["TotalRPValue"]+1,10) * 100);
+  SatelliteStats["BaseRPsBoost"] = (RS2Stats["BaseRPs"] + RS3Stats["BaseRPs"] + RS4Stats["BaseRPs"]) * ((SatelliteStats["PercentBoost"])/100);
+  SatelliteStats["RPsBoost"] = (RS2Stats["CurrentRPs"] + RS3Stats["CurrentRPs"] + RS4Stats["CurrentRPs"]) * ((SatelliteStats["PercentBoost"])/100);
 };
 
 function CalculateHighestRates() {
@@ -578,4 +578,5 @@ function DeselectAllFluids() {
     Fluid.className = "DeselectedButton";
   });
   Update();
+
 };
