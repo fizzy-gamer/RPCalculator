@@ -113,6 +113,7 @@ var TextIndex = {
   "Usage":          ["OrangeText", "u/s of the Item required!"],
   "PowerKMF":       ["OrangeText", "KMF/s required!"],
   "PowerMMF":       ["OrangeText", "MMF/s required!"],
+  "PowerSatellite": ["OrangeText", "KMF/s required for both Satellite Controllers and Dishes!"],
   "SatelliteUsage": ["OrangeText", "L/s of the Liquid required!"],
   "DishesRequired": ["RPText"," Satellite Dishes required for 100% Efficiency!"]
 }
@@ -174,7 +175,7 @@ var SatelliteStats = {
   "HighestRP":0,
   "HighestRPTime":0,
   "TargetRPTime":0,
-  "Power":0
+  "PowerSatellite":0
 };
 
 let AllStatTables = {
@@ -289,6 +290,7 @@ function CalculateSatellite(RPValue, Controllers) {
   SatelliteStats["PercentBoost"] = (0.78 * CustomLog(SatelliteStats["TotalRPValue"]+1,10) * 100);
   SatelliteStats["BaseRPsBoost"] = (RS2Stats["BaseRPs"] + RS3Stats["BaseRPs"] + RS4Stats["BaseRPs"]) * ((SatelliteStats["PercentBoost"])/100);
   SatelliteStats["RPsBoost"] = (RS2Stats["CurrentRPs"] + RS3Stats["CurrentRPs"] + RS4Stats["CurrentRPs"]) * ((SatelliteStats["PercentBoost"])/100);
+  SatelliteStats["PowerSatellite"] = (75*Controllers) + (75*SatelliteStats["DishesRequired"]);
 };
 
 function CalculateHighestRates() {
@@ -580,4 +582,5 @@ function DeselectAllFluids() {
   Update();
 
 };
+
 
