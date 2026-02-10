@@ -215,7 +215,7 @@ function CalculateRS2(RPValue, RS2s){
 };
 
 function CalculateRS3(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS3s, SameItems){
-  let TotalRPValue = RPValue1+RPValue2;
+  let TotalRPValue = (RPValue1+RPValue2)*RS3s;
   RS3Stats["Usage"] = RS3s*0.1;
   RS3Stats["PowerMMF"] = RS3s*0.6;
 
@@ -237,12 +237,12 @@ function CalculateRS3(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS3s, SameItems
   RS3Stats["RPCap"] = RS3Stats["BaseRPCap"];
   
 
-  RS3Stats["BaseRPs"] = 2*((TotalRPValue*RS3s)**0.6);
+  RS3Stats["BaseRPs"] = 2*((TotalRPValue)**0.6);
   CheckRPs(RS3Stats);
 };
 
 function CalculateRS4(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS4s, SameItems){
-  let TotalRPValue = RPValue1+RPValue2;
+  let TotalRPValue = (RPValue1+RPValue2)*RS4s;
   RS4Stats["Usage"] = RS4s*0.1;
   RS4Stats["PowerMMF"] = RS4s*5;
 
@@ -280,7 +280,7 @@ function CalculateRS4(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS4s, SameItems
   } else {
     RS4Stats["CurrentRPs"] = RS4Stats["BuffRPs"];
   };
-};  
+}; 
 
 function CalculateSatellite(RPValue, Controllers) {
   SatelliteStats["TotalRPValue"] = RPValue*Controllers;
@@ -580,3 +580,4 @@ function DeselectAllFluids() {
   Update();
 
 };
+
