@@ -65,7 +65,7 @@ export const RPValues = {
   "Fission Byproducts": 0,
   "Fracking Oil": 0.2,
   "Galvanized Steel": 33,
-  "Gasoline": 5,
+  "Gasoline": 7.5,
   "GasolineE10": 13,
   "Gear": 20,
   "Gearbox": 50,
@@ -213,3 +213,4 @@ export const RPValues = {
   "Zirconium Dioxide": 1,
   "Zirconium Rod": 1
 };
+
