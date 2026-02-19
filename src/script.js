@@ -259,7 +259,6 @@ function CalculateRS4(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS4s, SameItems
     RS4Stats["CapFactor"] = CustomLog((MathClamp(RS4Stats["CapFactor"], -0, 1) +1), 2);
   };
   RS4Stats["CapFactor"] *= RS4s;
-  RS4Stats["CapFactor"] *= 2;
 
   RS4Stats["BaseRPCap"] = 150000*(CustomLog(RS4Stats["CapFactor"]+1, 2)+(RS4Stats["CapFactor"]**0.9));
   RS4Stats["RPCap"] = RS4Stats["BaseRPCap"];
@@ -582,5 +581,6 @@ function DeselectAllFluids() {
   Update();
 
 };
+
 
 
