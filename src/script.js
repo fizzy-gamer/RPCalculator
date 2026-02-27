@@ -308,7 +308,7 @@ function CalculateHighestRates() {
       RS1TestRPs = RS1BaseRPs*(10**(1-((RS1Stats["HighestRP"]/RS1RPCap) > 1 ? RS1Stats["HighestRP"]/RS1RPCap : 1)));
       if (RS1Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS1Stats["TargetRPTime"] = RS1Stats["HighestRPTime"]; SetTargetRPTime = true;};
     };
-    if (SetTargetRPTime == false) {RS2Stats["TargetRPTime"] = Infinity;};
+    if (SetTargetRPTime == false) {RS1Stats["TargetRPTime"] = Infinity;};
   };
 
   RS2Stats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
@@ -581,6 +581,7 @@ function DeselectAllFluids() {
   Update();
 
 };
+
 
 
 
