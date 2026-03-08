@@ -24,7 +24,7 @@ for (let [ItemName, RPValue] of Object.entries(RPValues)) {
 
   let ButtonText = document.createElement("p");
   ButtonText.className = "ItemText";
-  ButtonText.innerHTML = ItemName + ': <span class="RPText">' + RPValue + "RP</span>" + ', <span class="MoneyText">$' + MoneyValues[ItemName].toString() + "</span>"
+  ButtonText.innerHTML = ItemName + ': <span class="RPText">' + Intl.NumberFormat("en-UK").format(RPValue) + "RP</span>" + ', <span class="MoneyText">$' + Intl.NumberFormat("en-UK").format(MoneyValues[ItemName]) + "</span>"
   Button.appendChild(ButtonText);
 };
 
@@ -581,6 +581,7 @@ function DeselectAllFluids() {
   Update();
 
 };
+
 
 
 
