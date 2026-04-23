@@ -1,92 +1,112 @@
 import { RPValues } from "./RPValues.js";
 import { MoneyValues } from "./MoneyValues.js";
 import { ItemIcons } from "./ItemIcons.js";
-import { FluidNames } from "./Fluids.js";
 
 //Setup buttons
 var ItemButtons = document.getElementById("ItemButtons");
 for (let [ItemName, RPValue] of Object.entries(RPValues)) { 
-  if (FluidNames.includes(ItemName)==true) {continue};
 
   let Button = document.createElement("button");
-  Button.className = "DeselectedButton";
+  Button.className = "ItemButton";
   Button.id = RPValue;
   Button.value = ItemName;
-  Button.onclick = function () {
-    ItemClicked(Button);
-  };
+  Button.onclick = function () {ItemClicked(Button);};
   ItemButtons.appendChild(Button);
 
-  let ButtonIcon = document.createElement("img");
-  ButtonIcon.src = ItemIcons[ItemName];
-  ButtonIcon.className = "ItemIcon";
-  Button.appendChild(ButtonIcon);
+  let ItemIcon = document.createElement("img");
+  ItemIcon.src = ItemIcons[ItemName];
+  ItemIcon.className = "ItemIcon";
+  Button.appendChild(ItemIcon);
 
   let ButtonText = document.createElement("p");
   ButtonText.className = "ItemText";
-  ButtonText.innerHTML = ItemName + ': <span class="RPText">' + Intl.NumberFormat("en-UK").format(RPValue) + "RP</span>" + ', <span class="MoneyText">$' + Intl.NumberFormat("en-UK").format(MoneyValues[ItemName]) + "</span>"
+  ButtonText.innerHTML = `${ItemName}: <span class="RPText"> ${Intl.NumberFormat("en-UK").format(RPValue)}RP</span>, <span class="GreenText">$${Intl.NumberFormat("en-UK").format(MoneyValues[ItemName])}</span>`
   Button.appendChild(ButtonText);
 };
 
-var FluidButtons = document.getElementById("FluidButtons");
-FluidNames.forEach(FluidName => {
-  let Button = document.createElement("button");
-  Button.className = "DeselectedButton";
-  Button.id = RPValues[FluidName];
-  Button.value = FluidName;
-  Button.onclick = function () {
-    FluidClicked(Button);
+var CurrentStations = {};
+var ResearchStationButtons = document.getElementById("ResearchStations")
+function AddStation(Type, Amount, Item1, Item2, CurrentName) {
+  let Offset = 1;
+  let BaseName = CurrentName == null ? `${Type}:` : CurrentName;
+  let Name = CurrentName == null ? `${BaseName}${Offset}` : CurrentName;
+  while (CurrentStations[Name] != null) {
+    Offset += 1;
+    Name = `${BaseName}${Offset}`;
   };
-  FluidButtons.appendChild(Button);
 
-  let ButtonIcon = document.createElement("img");
-  ButtonIcon.src = ItemIcons[FluidName];
-  ButtonIcon.className = "ItemIcon";
-  Button.appendChild(ButtonIcon);
+  let Station = document.getElementById(Type).cloneNode(true);
+  Station.id = "";
+  Station.value = Name;
+  Station.className = "Station";
+  Station.querySelector("p").innerText = document.getElementById(Type).value;
+  CurrentStations[Name] = {Station:Type, Amount: (Amount == null) ? 0 : Amount};
+  ResearchStationButtons.appendChild(Station);
 
-  let ButtonText = document.createElement("p");
-  ButtonText.className = "ItemText";
-  ButtonText.innerHTML = FluidName + ': <span class="RPText">' + RPValues[FluidName] + "RP</span>" + ', <span class="MoneyText">$' + MoneyValues[FluidName].toString() + "</span>"
-  Button.appendChild(ButtonText);
-});
+  let AmountInput = document.createElement("input");
+  AmountInput.className = "AmountInput";
+  AmountInput.placeholder = "Amount";
+  AmountInput.type = "number";
+  AmountInput.step = "1";
+  AmountInput.min = "0";
+  if (Amount != 0) {AmountInput.value = Amount;};
+  AmountInput.addEventListener("input", function(){CurrentStations[Name].Amount = (parseFloat(AmountInput.value) == NaN) ? 0: parseFloat(AmountInput.value); Update();});
+  Station.appendChild(AmountInput);
+
+  if (Type.indexOf("2") >-1 || Type.indexOf("3") >-1 || Type.indexOf("4") >-1 || Type.indexOf("Satellite") >-1) {
+    let ItemButton1 = document.createElement("button");
+    ItemButton1.className = "StationItem";
+    ItemButton1.innerText = (Item1 == null) ? "Click for Item!" : Item1;
+    ItemButton1.id = `${Name}:Item1`;
+    CurrentStations[Name]["Item1"] = (Item1 == null) ? "" : Item1;
+    ItemButton1.onclick = function() {SelectStationItem(Name, "Item1")};
+    Station.appendChild(ItemButton1);
+  };
+
+  if (Type.indexOf("3") >-1 || Type.indexOf("4") >-1) {
+    let ItemButton2 = document.createElement("button");
+    ItemButton2.className = "StationItem";
+    ItemButton2.innerText = (Item2 == null) ? "Click for Item!" : Item2;
+    ItemButton2.id = `${Name}:Item2`;
+    CurrentStations[Name]["Item2"] = (Item2 == null) ? "" : Item2;
+    ItemButton2.onclick = function() {SelectStationItem(Name, "Item2")};
+    Station.appendChild(ItemButton2);
+  };
+}
 
 //Button Handlers
-document.getElementById("DeselectAllItemButton").onclick = function() {DeselectAllItems();};
-document.getElementById("DeselectAllFluidButton").onclick = function() {DeselectAllFluids();};
+document.getElementById("RS1").onclick = function() {AddStation("RS1");};
+document.getElementById("RS2").onclick = function() {AddStation("RS2");};
+document.getElementById("RS3").onclick = function() {AddStation("RS3");};
+document.getElementById("RS4").onclick = function() {AddStation("RS4");};
+document.getElementById("Satellite").onclick = function() {AddStation("Satellite");};
 
-document.getElementById("RS2Mode").onclick = function() {SetMode("RS2");};
-document.getElementById("RS3Mode").onclick = function() {SetMode("RS3");};
-document.getElementById("RS3BothMode").onclick = function() {SetMode("RS3Both");};
-
-document.getElementById("CurrentRPAmount").addEventListener("input", function() {Update();});
-document.getElementById("TargetRPAmount").addEventListener("input", function() {Update();});
-document.getElementById("RS1Amount").addEventListener("input", function() {Update();});
-document.getElementById("RS2Amount").addEventListener("input", function() {document.getElementById("RS2Mode").className = "SelectionDisabled"; SetMode("RS2");});
-document.getElementById("RS3Amount").addEventListener("input", function() {document.getElementById("RS3Mode").className = "SelectionDisabled"; SetMode("RS3");});
-document.getElementById("RS4Amount").addEventListener("input", function() {document.getElementById("RS3Mode").className = "SelectionDisabled"; SetMode("RS3");});
-document.getElementById("SatelliteControllerAmount").addEventListener("input", function() {Update();});
+var CurrentRPInput = document.getElementById("CurrentRP");
+var TargetRPInput = document.getElementById("TargetRP");
+CurrentRPInput.addEventListener("input", function() {Update();});
+TargetRPInput.addEventListener("input", function() {Update();});
 
 //Sort
 var Items = ItemButtons.children;
 Items = Array.from(Items).sort((a, b) => parseFloat(b.id) - parseFloat(a.id));
 Items.forEach(Item => {ItemButtons.appendChild(Item);});
 
-var Fluids = FluidButtons.children;
-Fluids = Array.from(Fluids).sort((a, b) => parseFloat(b.id) - parseFloat(a.id));
-Fluids.forEach(Fluid => {FluidButtons.appendChild(Fluid);});
+var ItemSearchInput = document.getElementById("ItemSearch");
+function SearchFilter() {
+  const Query = ItemSearchInput.value.toUpperCase();
+  const Buttons = ItemButtons.getElementsByTagName("button");
+  for (let i = 0; i < Buttons.length; i++) {
+    let Value = Buttons[i].value;
+    if (Value.toUpperCase().indexOf(Query) > -1) {
+      Buttons[i].style.display = "";
+    } else {
+      Buttons[i].style.display = "none";
+    };
+  };
+};
+ItemSearchInput.onkeyup = function() {SearchFilter();};
 
 //Mathz
-var ItemAmountSelectedText = document.getElementById("ItemAmountSelected");
-var CurrentRPAmountInput = document.getElementById("CurrentRPAmount");
-var TargetRPAmountInput = document.getElementById("TargetRPAmount");
-
-var Selected = {"RS2":[],"RS3":[],"RS3Both":[],"SatelliteController":[]};
-var SelectedTexts = {
-  "RS2":"/1 Selected",
-  "RS3":"/2 Selected",
-  "RS3Both":"/1 Selected"
-};
-
 function Round2DP(Number){
   return Math.round(Number*100)/100;
 };
@@ -104,485 +124,250 @@ var TextIndex = {
   "RPCap":          ["RPText", "RP Cap"],
   "BaseRPs" :       ["RPText", "RP/s - Original"],
   "CurrentRPs" :    ["RPText", "RP/s - Current"],
-  "RPsBoost" :      ["RPText", "RP/s Boost (at 100% Efficiency)"],
-  "PercentBoost" :  ["RPText", "% Boost (at 100% Efficiency)"],
   "BuffRPs" :       ["RPText", "RP/s - When Minigame"],
+  "BaseRPsBoost" :  ["RPText", "RP/s Boost (at 100% Efficiency) - Original"],
+  "CurrentRPsBoost":["RPText", "RP/s Boost (at 100% Efficiency) - Current"],
   "HighestRP":      ["GreyText", "RP when RP/s is 1% of original or 10M RP"],
   "HighestRPTime":  ["GreyText", " seconds until RP/s is 1% of original or 10M RP"],
   "TargetRPTime":   ["GreyText", " seconds until Target RP is reached"],
-  "Usage":          ["OrangeText", "u/s of the Item required!"],
+  "Usage":          ["OrangeText", "u/s of the Item(s) required!"],
   "PowerKMF":       ["OrangeText", "KMF/s required!"],
   "PowerMMF":       ["OrangeText", "MMF/s required!"],
+  "PercentBoost" :  ["RPText", "% Boost (at 100% Efficiency)"],
   "PowerSatellite": ["OrangeText", "KMF/s required for both Satellite Controllers and Dishes!"],
   "SatelliteUsage": ["OrangeText", "L/s of the Liquid required!"],
   "DishesRequired": ["RPText"," Satellite Dishes required for 100% Efficiency!"]
-}
-
-var RS1Stats = {
-  "RPCap":0,
-  "BaseRPs":0,
-  "CurrentRPs":0,
-  "HighestRP":0,
-  "HighestRPTime":0,
-  "TargetRPTime":0,
-  "PowerKMF":0
 };
 
-var RS2Stats = {
-  "RPCap":0,
-  "BaseRPs":0,
-  "CurrentRPs":0,
-  "HighestRP":0,
-  "HighestRPTime":0,
-  "TargetRPTime":0,
-  "Usage":0,
-  "PowerKMF":0
-};
-
-var RS3Stats = {
-  "BaseRPCap":0,
-  "RPCap":0,
-  "CapFactor":0,
-  "BaseRPs":0,
-  "CurrentRPs":0,
-  "HighestRP":0,
-  "HighestRPTime":0,
-  "TargetRPTime":0,
-  "Usage":0,
-  "PowerMMF":0
-};
-
-var RS4Stats = {
-  "BaseRPCap":0,
-  "RPCap":0,
-  "CapFactor":0,
-  "BaseRPs":0,
-  "CurrentRPs":0,
-  "BuffRPs":0,
-  "HighestRP":0,
-  "HighestRPTime":0,
-  "TargetRPTime":0,
-  "Usage":0,
-  "PowerMMF":0
-};
-
-var SatelliteStats = {
-  "DishesRequired":0,
-  "SatelliteUsage":0,
-  "PercentBoost":0,
-  "BaseRPsBoost":0,
-  "RPsBoost":0,
-  "HighestRP":0,
-  "HighestRPTime":0,
-  "TargetRPTime":0,
-  "PowerSatellite":0
-};
-
-let AllStatTables = {
-  "RS1":RS1Stats,
-  "RS2":RS2Stats,
-  "RS3":RS3Stats,
-  "RS4":RS4Stats,
-  "Satellite":SatelliteStats
-};
-
-function CheckRPs(RSSatTable) {
-  let CurrentRP = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  if (RSSatTable["BaseRPs"] > 0 && CurrentRP > RSSatTable["RPCap"]) {
-    let TestingRP = RSSatTable["RPCap"];
-    while (TestingRP < CurrentRP) {
-      TestingRP += RSSatTable["CurrentRPs"];
-      RSSatTable["CurrentRPs"] = RSSatTable["BaseRPs"]*(10**(1-((TestingRP/RSSatTable["RPCap"]) >1 ? TestingRP/RSSatTable["RPCap"] : 1)));
-      if (RSSatTable["CurrentRPs"] <= RSSatTable["BaseRPs"]*0.01) {break};
-    };
-  } else {
-    RSSatTable["CurrentRPs"] = RSSatTable["BaseRPs"];
+function CalculateCap(Teir, Amount) {
+  if (Teir == 1) {
+		return 200*CustomLog(Amount+1, 2);
+  } else if (Teir == 2) {
+		return 2000*CustomLog(Amount+1, 2);
+  } else if (Teir == 3) {
+		return 1.1*15000*(CustomLog(Amount+1, 2)+Math.sqrt(Amount));
+  } else if (Teir == 4) {
+		return 150000*(CustomLog(Amount+1, 2)+Math.pow(Amount, 0.9));
   };
 };
-
-function CalculateRS1(RS1s) {
-  RS1Stats["PowerKMF"] = RS1s*2.1;
-  RS1Stats["BaseRPs"] = Math.sqrt(RS1s);
-  RS1Stats["RPCap"] = RS1s>0 ? 200*(CustomLog((RS1s+1),2)): 0;
-  CheckRPs(RS1Stats);
+function CalculateRPs(Teir, Amount, TotalRPValue, Cap, CurrentRP) {
+  if (Cap == 0) {return 0};
+  let Factor = Math.max((CurrentRP/Cap), 1);
+  if (Teir == 1) {
+		return Math.sqrt(Amount)*(10**(1-Factor));
+  } else if (Teir == 2 || Teir == 3) {
+    return 2*Math.pow(TotalRPValue, 0.6)*(10**(1-Factor));
+  } else if (Teir == 4) {
+    return 2*Math.pow(TotalRPValue, 0.6)*(10**(1-Math.sqrt(Factor)));
+  };
 };
-
-function CalculateRS2(RPValue, RS2s){
-  RS2Stats["Usage"] = RS2s*0.5;
-  RS2Stats["PowerKMF"] = RS2s*17;
-  RS2Stats["BaseRPs"] = 2*((RPValue*RS2s)**0.6);
-  RS2Stats["RPCap"] = RS2s>0 ? 2000*(CustomLog((RS2s+1),2)): 0;
-  CheckRPs(RS2Stats);
+function CalculateRS4Buff(Cap, Amount) {
+  return Cap*0.000025*Amount;
 };
-
-function CalculateRS3(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS3s, SameItems){
-  let TotalRPValue = (RPValue1+RPValue2)*RS3s;
-  RS3Stats["Usage"] = RS3s*0.1;
-  RS3Stats["PowerMMF"] = RS3s*0.6;
-
-  if (SameItems == true) {
-    TotalRPValue *=0.7;
-    RS3Stats["Usage"] = RS3s*0.2;
-  };
-
-  let AverageMoney = (MoneyValue1+MoneyValue2)/2;
-  RS3Stats["CapFactor"] = AverageMoney/600;
-  if (RS3Stats["CapFactor"] >= 1) {
-    RS3Stats["CapFactor"] = CustomLog(RS3Stats["CapFactor"], 4) +1;
-  } else if (RS3Stats["CapFactor"] < 1) {
-    RS3Stats["CapFactor"] = CustomLog((MathClamp(RS3Stats["CapFactor"], -0, 1) +1), 2);
-  };
-  RS3Stats["CapFactor"] *= RS3s;
-
-  RS3Stats["BaseRPCap"] = 1.1*15000*(CustomLog((RS3Stats["CapFactor"]+1),2) + Math.sqrt(RS3Stats["CapFactor"]));
-  RS3Stats["RPCap"] = RS3Stats["BaseRPCap"];
-  
-
-  RS3Stats["BaseRPs"] = 2*((TotalRPValue)**0.6);
-  CheckRPs(RS3Stats);
-};
-
-function CalculateRS4(RPValue1,RPValue2,MoneyValue1,MoneyValue2, RS4s, SameItems){
-  let TotalRPValue = (RPValue1+RPValue2)*RS4s;
-  RS4Stats["Usage"] = RS4s*0.1;
-  RS4Stats["PowerMMF"] = RS4s*5;
-
-  if (SameItems == true) {
-    TotalRPValue *=0.7;
-  };
-
-  let AverageMoney = (MoneyValue1+MoneyValue2)/2;
-  RS4Stats["CapFactor"] = AverageMoney/600;
-  if (RS4Stats["CapFactor"] >= 1) {
-    RS4Stats["CapFactor"] = CustomLog(RS4Stats["CapFactor"], 4) +1;
-  } else if (RS4Stats["CapFactor"] < 1) {
-    RS4Stats["CapFactor"] = CustomLog((MathClamp(RS4Stats["CapFactor"], -0, 1) +1), 2);
-  };
-  RS4Stats["CapFactor"] *= RS4s;
-
-  RS4Stats["BaseRPCap"] = 150000*(CustomLog(RS4Stats["CapFactor"]+1, 2)+(RS4Stats["CapFactor"]**0.9));
-  RS4Stats["RPCap"] = RS4Stats["BaseRPCap"];
-  
-  RS4Stats["BaseRPs"] = (2*((TotalRPValue)**0.6));
-  RS4Stats["BuffRPs"] = RS4Stats["BaseRPs"] + (RS4Stats["RPCap"]*0.000025*RS4s)
-  
-  let CurrentRP = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  let TestingRP = 0;
-  if (CurrentRP > RS4Stats["RPCap"] && RS4Stats["BaseRPs"] > 0) {
-    while (TestingRP < RS4Stats["RPCap"]) {
-      TestingRP += RS4Stats["BuffRPs"];
-    };
-    while (TestingRP < CurrentRP) {
-      TestingRP += RS4Stats["CurrentRPs"];
-      RS4Stats["CurrentRPs"] = (RS4Stats["BaseRPs"])*(10**(1-(Math.sqrt(((TestingRP/RS4Stats["RPCap"]) > 1 ? (TestingRP/RS4Stats["RPCap"]) : 1)))));
-      if (RS4Stats["CurrentRPs"] <= RS4Stats["BaseRPs"]*0.01) {break};
-    };
-  } else {
-    RS4Stats["CurrentRPs"] = RS4Stats["BuffRPs"];
-  };
-}; 
-
-function CalculateSatellite(RPValue, Controllers) {
-  SatelliteStats["TotalRPValue"] = RPValue*Controllers;
-  SatelliteStats["DishesRequired"] = Math.sqrt(SatelliteStats["TotalRPValue"]*Controllers)+Controllers;
-  SatelliteStats["SatelliteUsage"] = Controllers*0.5;
-  SatelliteStats["PercentBoost"] = (0.78 * CustomLog(SatelliteStats["TotalRPValue"]+1,10) * 100);
-  SatelliteStats["BaseRPsBoost"] = (RS2Stats["BaseRPs"] + RS3Stats["BaseRPs"] + RS4Stats["BaseRPs"]) * ((SatelliteStats["PercentBoost"])/100);
-  SatelliteStats["RPsBoost"] = (RS2Stats["CurrentRPs"] + RS3Stats["CurrentRPs"] + RS4Stats["CurrentRPs"]) * ((SatelliteStats["PercentBoost"])/100);
-  SatelliteStats["PowerSatellite"] = (75*Controllers) + (75*SatelliteStats["DishesRequired"]);
-};
-
-function CalculateHighestRates() {
-  let TargetRPAmount = parseFloat(TargetRPAmountInput.value)>0 ? parseFloat(TargetRPAmountInput.value): 0;
-
-  RS1Stats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  RS1Stats["HighestRPTime"] = 0;
-  if (RS1Stats["BaseRPs"] > 0) {
-    let RS1TestRPs = RS1Stats["CurrentRPs"];
-    let RS1BaseRPs = RS1Stats["BaseRPs"];
-    let RS1RPCap = RS1Stats["RPCap"];
-    let SetTargetRPTime = false;
-    while (RS1TestRPs > (RS1Stats["BaseRPs"]*0.01) && RS1Stats["HighestRP"] < 10000000) {
-      RS1Stats["HighestRPTime"] +=1;
-      RS1Stats["HighestRP"] += RS1TestRPs;
-      RS1TestRPs = RS1BaseRPs*(10**(1-((RS1Stats["HighestRP"]/RS1RPCap) > 1 ? RS1Stats["HighestRP"]/RS1RPCap : 1)));
-      if (RS1Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS1Stats["TargetRPTime"] = RS1Stats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    if (SetTargetRPTime == false) {RS1Stats["TargetRPTime"] = Infinity;};
-  };
-
-  RS2Stats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  RS2Stats["HighestRPTime"] = 0;
-  if (RS2Stats["BaseRPs"] > 0) {
-    let RS2TestRPs = RS2Stats["CurrentRPs"];
-    let RS2BaseRPs = RS2Stats["BaseRPs"];
-    let RS2RPCap = RS2Stats["RPCap"];
-    let SetTargetRPTime = false;
-    while (RS2TestRPs > (RS2Stats["BaseRPs"]*0.01) && RS2Stats["HighestRP"] < 10000000) {
-      RS2Stats["HighestRPTime"] +=1;
-      RS2Stats["HighestRP"] += RS2TestRPs;
-      RS2TestRPs = RS2BaseRPs*(10**(1-((RS2Stats["HighestRP"]/RS2RPCap) > 1 ? RS2Stats["HighestRP"]/RS2RPCap : 1)));
-      if (RS2Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS2Stats["TargetRPTime"] = RS2Stats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    if (SetTargetRPTime == false) {RS2Stats["TargetRPTime"] = Infinity;};
-  };
-
-  RS3Stats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  RS3Stats["HighestRPTime"] = 0;
-  if (RS3Stats["BaseRPs"] > 0) {
-    let RS3TestRPs = RS3Stats["CurrentRPs"];
-    let RS3BaseRPs = RS3Stats["BaseRPs"];
-    let RS3RPCap = RS3Stats["RPCap"];
-    let SetTargetRPTime = false;
-    while ((RS3TestRPs > (RS3Stats["BaseRPs"]*0.01)) && (RS3Stats["HighestRP"] < 10000000)) {
-      RS3Stats["HighestRPTime"] +=1;
-      RS3Stats["HighestRP"] += RS3TestRPs;
-      RS3TestRPs = RS3BaseRPs*(10**(1-((RS3Stats["HighestRP"]/RS3RPCap) > 1 ? RS3Stats["HighestRP"]/RS3RPCap : 1)));
-      if (RS3Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS3Stats["TargetRPTime"] = RS3Stats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    if (SetTargetRPTime == false) {RS3Stats["TargetRPTime"] = Infinity;};
-  };
-
-  RS4Stats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  RS4Stats["HighestRPTime"] = 0;
-  if (RS4Stats["BaseRPs"] > 0) {
-    let RS4TestRPs = RS4Stats["BaseRPs"];
-    let RS4BaseRPs = RS4Stats["BaseRPs"];
-    let RS4RPCap = RS4Stats["RPCap"];
-    let SetTargetRPTime = false;
-
-    while (RS4Stats["HighestRP"] < RS4RPCap && RS4Stats["HighestRP"] < 10000000) {
-      RS4Stats["HighestRP"] += RS4Stats["BuffRPs"];
-      RS4Stats["HighestRPTime"] +=1;
-      if (RS4Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS4Stats["TargetRPTime"] = RS4Stats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    while (RS4TestRPs > (RS4BaseRPs*0.01) && RS4Stats["HighestRP"] < 10000000) {
-      RS4Stats["HighestRP"] += RS4TestRPs;
-      RS4Stats["HighestRPTime"] +=1;
-      let RS4Factor = RS4Stats["HighestRP"]/RS4RPCap
-      RS4TestRPs = RS4BaseRPs*(10**(1-(Math.sqrt((RS4Factor > 1 ? RS4Factor : 1)))));
-      if (RS4Stats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {RS4Stats["TargetRPTime"] = RS4Stats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    if (SetTargetRPTime == false) {RS4Stats["TargetRPTime"] = Infinity;};
-  };
-
-  SatelliteStats["HighestRP"] = parseFloat(CurrentRPAmountInput.value)>0 ? parseFloat(CurrentRPAmountInput.value): 0;
-  SatelliteStats["HighestRPTime"] = 0;
-  if ((RS2Stats["BaseRPs"] > 0 || RS3Stats["BaseRPs"] > 0 || RS4Stats["BaseRPs"] > 0) && SatelliteStats["BaseRPsBoost"] > 0) {
-    let RS2TestRPs = RS2Stats["CurrentRPs"];
-    let RS3TestRPs = RS3Stats["CurrentRPs"];
-    let RS4TestRPs = RS4Stats["CurrentRPs"];
-    let TestRPsBoost = SatelliteStats["RPsBoost"];
-    let SetTargetRPTime = false;
-
-    while ((RS2TestRPs > (RS2Stats["BaseRPs"]*0.01) || RS3TestRPs > (RS3Stats["BaseRPs"]*0.01) || RS4TestRPs > (RS4Stats["BaseRPs"]*0.01)) && SatelliteStats["HighestRP"] < 10000000) {
-      SatelliteStats["HighestRPTime"] +=1;
-      SatelliteStats["HighestRP"] += (RS2TestRPs+RS3TestRPs+RS4TestRPs+TestRPsBoost);
-
-      let RS2Factor = SatelliteStats["HighestRP"]/RS2Stats["RPCap"];
-      RS2TestRPs = RS2Stats["BaseRPs"]*(10**(1-(RS2Factor > 1 ? RS2Factor : 1)));
-
-      let RS3Factor = SatelliteStats["HighestRP"]/RS3Stats["RPCap"];
-      RS3TestRPs = RS3Stats["BaseRPs"]*(10**(1-(RS3Factor > 1 ? RS3Factor : 1)));
-
-      if (SatelliteStats["HighestRP"] < RS4Stats["RPCap"]) {
-        RS4TestRPs = RS4Stats["BuffRPs"];
-      } else {
-        let RS4Factor = SatelliteStats["HighestRP"]/RS4Stats["RPCap"];
-        RS4TestRPs = RS4Stats["BaseRPs"]*(10**(1-(Math.sqrt((RS4Factor > 1 ? RS4Factor : 1)))));
-      };
-
-      TestRPsBoost = 0.78 * (RS2TestRPs+RS3TestRPs+RS4TestRPs) * CustomLog(SatelliteStats["TotalRPValue"]+1,10);
-      if (SatelliteStats["HighestRP"] >= TargetRPAmount && SetTargetRPTime == false) {SatelliteStats["TargetRPTime"] = SatelliteStats["HighestRPTime"]; SetTargetRPTime = true;};
-    };
-    if (SetTargetRPTime == false) {SatelliteStats["TargetRPTime"] = Infinity;};
-  };
+function CalculateSatellite(Amount, TotalRPValue) {
+  return [Math.sqrt(TotalRPValue*Amount)+Amount, 0.78 * Math.max(CustomLog(TotalRPValue+1,10),0) *100]; //[Satelites Required, Boost]
 };
 
 function Update() {
-  let RS1Amount = parseFloat(document.getElementById("RS1Amount").value);
-  if (RS1Amount > 0) {
-    CalculateRS1(RS1Amount);
-  } else {CalculateRS1(0);};
-
-  let RPValue1 = 0;
-  let RPValue2 = 0;
-  let MoneyValue1 = 0;
-  let MoneyValue2 = 0;
-  let SameItems = false;
-
-  if ((CurrentMode=="RS2" || CurrentMode == "RS3") && Selected["RS3"].length >= 2) {
-    RPValue1 = RPValues[Selected["RS3"][0].value];
-    RPValue2 = RPValues[Selected["RS3"][1].value];
-    MoneyValue1 = MoneyValues[Selected["RS3"][0].value];
-    MoneyValue2 = MoneyValues[Selected["RS3"][1].value];
-    document.getElementById("RS3DoubleItems").innerText = "";
-
-  } else if (CurrentMode == "RS3") {
-    RPValue1,RPValue2,MoneyValue1,MoneyValue2 = 0;
-    document.getElementById("RS3DoubleItems").innerText = "";
-
-  } else if (CurrentMode == "RS3Both") {
-    RPValue1, RPValue2 = Selected[CurrentMode].length > 0 ? RPValues[Selected[CurrentMode][0].value] : 0 ;
-    MoneyValue1, MoneyValue2 = Selected[CurrentMode].length > 0 ? MoneyValues[Selected[CurrentMode][0].value] : 0 ;
-    SameItems = true;
-    document.getElementById("RS3DoubleItems").innerText = "RS3s Suffer a 30% production loss from the same items!";
+  let CurrentRP = (parseFloat(CurrentRPInput.value) >0) ?parseFloat(CurrentRPInput.value) :0;
+  let TargetRP = (parseFloat(TargetRPInput.value) >0) ?parseFloat(TargetRPInput.value) :0;
+  let UpdateStats = {
+    "RS1":{"Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerKMF":0},
+    "RS2":{"Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerKMF":0, "Usage":0},
+    "RS3":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "Double":false},
+    "RS4":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "BuffRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "Double":false},
+    "Satellite":{"Amount":0, "TotalRPValue":0, "PercentBoost":0, "BaseRPsBoost":0, "CurrentRPsBoost":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerSatellite":0, "SatelliteUsage":0, "DishesRequired":0}
   };
+  Object.entries(CurrentStations).forEach(Station => {
+    if (UpdateStats[Station[1].Station] == null) {return};
 
-  let RS2Amount = parseFloat(document.getElementById("RS2Amount").value);
-  if (RS2Amount > 0) {
-    CalculateRS2((Selected[CurrentMode].length > 0 ? RPValues[Selected[CurrentMode][0].value] : 0), RS2Amount);
-  } else {CalculateRS2(0,0);};
-  
-  let RS3Amount = parseFloat(document.getElementById("RS3Amount").value);
-  if (RS3Amount > 0) {
-    CalculateRS3(RPValue1, RPValue2, MoneyValue1, MoneyValue2, RS3Amount, SameItems);
-  } else {CalculateRS3(0,0,0,0,0,false);};
-  
-  let RS4Amount = parseFloat(document.getElementById("RS4Amount").value);
-  if (RS4Amount > 0) {
-    CalculateRS4(RPValue1, RPValue2, MoneyValue1, MoneyValue2, RS4Amount, SameItems);
-  } else {CalculateRS4(0,0,0,0,0,false);};
-
-  let SatelliteControllerAmount = parseFloat(document.getElementById("SatelliteControllerAmount").value);
-  if (SatelliteControllerAmount > 0) {
-    CalculateSatellite(Selected["SatelliteController"].length > 0 ? RPValues[Selected["SatelliteController"][0].value] : 0, (SatelliteControllerAmount > 0 ? SatelliteControllerAmount : 0));
-  };
-
-  CalculateHighestRates();
-
-  ItemAmountSelectedText.innerText = Selected[CurrentMode].length + SelectedTexts[CurrentMode];
-  if (Selected[CurrentMode].length > 0) {
-    let CurrentItemSelectedText = "Selected: ";
-    let AddedComma = false;
-    Selected[CurrentMode].forEach(ItemButton => {
-      CurrentItemSelectedText += ItemButton.value;
-      if (Selected[CurrentMode].length >= 2 && AddedComma == false) {
-        CurrentItemSelectedText += ", ";
-        AddedComma = true;
+    if (Station[1].Station == "RS3" || Station[1].Station == "RS4") {
+      let MoneyBuff = (((MoneyValues[Station[1].Item1]==null ?0 :MoneyValues[Station[1].Item1])+(MoneyValues[Station[1].Item2]==null ?0 :MoneyValues[Station[1].Item2]))/2) /600;
+      if (MoneyBuff < 1) {
+        MoneyBuff = CustomLog(MathClamp(MoneyBuff,0,1)+1,2);
+      } else {
+        MoneyBuff = CustomLog(MoneyBuff, 4)+1;
       };
-    });
-    document.getElementById("ItemSelected").innerText = CurrentItemSelectedText;
-  } else {
-    document.getElementById("ItemSelected").innerText = "Selected: None";
+      if (Station[1].Station == "RS4") {MoneyBuff *=2;}; //Logic Buff
+
+      let TotalRP = (RPValues[Station[1].Item1]==null ?0 :RPValues[Station[1].Item1]) + (RPValues[Station[1].Item2]==null ?0 :RPValues[Station[1].Item2]);
+      if (Station[1].Item1 == Station[1].Item2) {TotalRP *= 0.7; UpdateStats[Station[1].Station].Double = true;};
+
+      UpdateStats[Station[1].Station].Amount += MoneyBuff * Station[1].Amount;
+      UpdateStats[Station[1].Station].RawAmount += Station[1].Amount
+      UpdateStats[Station[1].Station].TotalRPValue += TotalRP*Station[1].Amount;
+    } else {
+      UpdateStats[Station[1].Station].TotalRPValue += ((RPValues[Station[1].Item1]==null ?0 :RPValues[Station[1].Item1]) +(RPValues[Station[1].Item2]==null ?0 :RPValues[Station[1].Item2])) *Station[1].Amount;
+      UpdateStats[Station[1].Station].Amount += Station[1].Amount;
+    };
+  });
+  for (let i = 1; i <= 4; i++) {
+    UpdateStats[`RS${i}`].RPCap = CalculateCap(i, UpdateStats[`RS${i}`].Amount);
+    UpdateStats[`RS${i}`].BaseRPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, 0);
+    UpdateStats[`RS${i}`].CurrentRPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, CurrentRP);
+  };
+  UpdateStats["RS4"].BuffRPs = CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount);
+  UpdateStats["RS2"].Usage = UpdateStats["RS2"].Amount * 0.5;
+  UpdateStats["RS3"].Usage = UpdateStats["RS3"].RawAmount * 0.2;
+  UpdateStats["RS4"].Usage = UpdateStats["RS4"].RawAmount * 0.2;
+  UpdateStats["RS1"].PowerKMF = UpdateStats["RS1"].Amount * 2.1;
+  UpdateStats["RS2"].PowerKMF = UpdateStats["RS2"].Amount * 17;
+  UpdateStats["RS3"].PowerMMF = UpdateStats["RS3"].RawAmount * 0.6;
+  UpdateStats["RS4"].PowerMMF = UpdateStats["RS4"].RawAmount * 5;
+
+  UpdateStats["Satellite"].DishesRequired = CalculateSatellite(UpdateStats["Satellite"].Amount, UpdateStats["Satellite"].TotalRPValue)[0];
+  UpdateStats["Satellite"].PercentBoost = CalculateSatellite(UpdateStats["Satellite"].Amount, UpdateStats["Satellite"].TotalRPValue)[1];
+  UpdateStats["Satellite"].BaseRPsBoost = (UpdateStats["RS1"].BaseRPs +UpdateStats["RS2"].BaseRPs +UpdateStats["RS3"].BaseRPs +UpdateStats["RS4"].BaseRPs +CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount)) * ((UpdateStats["Satellite"].PercentBoost/100)+1)
+  UpdateStats["Satellite"].CurrentRPsBoost = (UpdateStats["RS1"].CurrentRPs +UpdateStats["RS2"].CurrentRPs +UpdateStats["RS3"].CurrentRPs +UpdateStats["RS4"].CurrentRPs +(CurrentRP < UpdateStats["RS4"].RPCap ?CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount) :0)) * ((UpdateStats["Satellite"].PercentBoost/100)+1)
+  UpdateStats["Satellite"].SatelliteUsage = UpdateStats["Satellite"].Amount * 0.5;
+  UpdateStats["Satellite"].PowerSatellite = (UpdateStats["Satellite"].Amount *75) + (UpdateStats["Satellite"].DishesRequired *75);
+
+  let Trial = {
+    "RS1":{"Min":UpdateStats["RS1"].BaseRPs*0.01, "RPs":UpdateStats["RS1"].CurrentRPs, "RP":CurrentRP, "Time":0},
+    "RS2":{"Min":UpdateStats["RS2"].BaseRPs*0.01, "RPs":UpdateStats["RS2"].CurrentRPs, "RP":CurrentRP, "Time":0},
+    "RS3":{"Min":UpdateStats["RS3"].BaseRPs*0.01, "RPs":UpdateStats["RS3"].CurrentRPs, "RP":CurrentRP, "Time":0},
+    "RS4":{"Min":UpdateStats["RS4"].BaseRPs*0.01, "RPs":UpdateStats["RS4"].CurrentRPs, "RP":CurrentRP, "Time":0},
+    "Satellite":{"Min":UpdateStats["Satellite"].BaseRPsBoost*0.01, "RPs":UpdateStats["Satellite"].CurrentRPsBoost, "RP":CurrentRP, "Time":0}
   };
 
-  document.getElementById("FluidAmountSelected").innerText = Selected["SatelliteController"].length + "/1 Selected";
-  document.getElementById("FluidSelected").innerText = Selected["SatelliteController"].length > 0 ? ("Selected: "+Selected["SatelliteController"][0].value) : "Selected: None";
+  //RS1,2,3 Highest RP & Target Time
+  for (let i = 1; i <= 3; i++) {
+    let TargetTimeSet = false;
+    while (Trial[`RS${i}`].RPs > Trial[`RS${i}`].Min && Trial[`RS${i}`].RPs > 0 && Trial[`RS${i}`].RP < 10000000) {
+      Trial[`RS${i}`].RPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, Trial[`RS${i}`].RP);
+      Trial[`RS${i}`].RP += Trial[`RS${i}`].RPs;
+      Trial[`RS${i}`].Time += 1;
+      if (TargetTimeSet == false && Trial[`RS${i}`].RP > TargetRP) {UpdateStats[`RS${i}`].TargetRPTime = Trial[`RS${i}`].Time; TargetTimeSet=true;};
+    };
+    UpdateStats[`RS${i}`].HighestRP = Trial[`RS${i}`].RP;
+    UpdateStats[`RS${i}`].HighestRPTime = Trial[`RS${i}`].Time;
+    if (TargetTimeSet == false) {UpdateStats[`RS${i}`].TargetRPTime = Infinity;};
+  };
+  //RS4 Highest RP & Target Time
+  let RS4Buff = CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount);
+  let RS4TargetTimeSet = false;
+  while (Trial["RS4"].RPs > Trial["RS4"].Min && Trial["RS4"].RPs > 0 && Trial["RS4"].RP < 10000000) {
+    Trial["RS4"].RPs = CalculateRPs(4, UpdateStats["RS4"].Amount, UpdateStats["RS4"].TotalRPValue, UpdateStats["RS4"].RPCap, Trial["RS4"].RP);
+    Trial["RS4"].RP += Trial["RS4"].RPs + (Trial["RS4"].RP < UpdateStats["RS4"].RPCap ?RS4Buff :0);
+    Trial["RS4"].Time += 1;
+    if (RS4TargetTimeSet == false && Trial["RS4"].RP > TargetRP) {UpdateStats["RS4"].TargetRPTime = Trial["RS4"].Time; RS4TargetTimeSet=true;};
+  };
+  UpdateStats["RS4"].HighestRP = Trial["RS4"].RP;
+  UpdateStats["RS4"].HighestRPTime = Trial["RS4"].Time;
+  if (RS4TargetTimeSet == false) {UpdateStats["RS4"].TargetRPTime = Infinity;};
 
-  Object.entries(AllStatTables).forEach(function(StatTableData){ //Data[0] = Index, Data[1] = Value
-    Object.entries(StatTableData[1]).forEach(function(Data){ //Data[0] = Index, Data[1] = Value
-      if (document.getElementById(StatTableData[0]+Data[0])) {
-        document.getElementById(StatTableData[0]+Data[0]).innerHTML = '<span class="'+TextIndex[Data[0]][0]+'">'+Intl.NumberFormat("en-UK").format(Round2DP(Data[1]))+TextIndex[Data[0]][1]+"</span>";
+  //Satellite
+  let SatelliteTargetTimeSet = false;
+  while (Trial["Satellite"].RPs > Trial["Satellite"].Min && Trial["Satellite"].RPs > 0 && Trial["Satellite"].RP < 10000000) {
+    let NewRS1RPs = CalculateRPs(1, UpdateStats["RS1"].Amount, UpdateStats["RS1"].TotalRPValue, UpdateStats["RS1"].RPCap, Trial["Satellite"].RP);
+    let NewRS2RPs = CalculateRPs(2, UpdateStats["RS2"].Amount, UpdateStats["RS2"].TotalRPValue, UpdateStats["RS2"].RPCap, Trial["Satellite"].RP);
+    let NewRS3RPs = CalculateRPs(3, UpdateStats["RS3"].Amount, UpdateStats["RS3"].TotalRPValue, UpdateStats["RS3"].RPCap, Trial["Satellite"].RP);
+    let NewRS4RPs = CalculateRPs(4, UpdateStats["RS4"].Amount, UpdateStats["RS4"].TotalRPValue, UpdateStats["RS4"].RPCap, Trial["Satellite"].RP) + (Trial["Satellite"].RP < UpdateStats["RS4"].RPCap ?RS4Buff :0);
+    Trial["Satellite"].RPs = (NewRS1RPs +NewRS2RPs +NewRS3RPs +NewRS4RPs) * ((UpdateStats["Satellite"].PercentBoost/100)+1);
+    Trial["Satellite"].RP += Trial["Satellite"].RPs;
+    Trial["Satellite"].Time +=1;
+    if (SatelliteTargetTimeSet == false && Trial["Satellite"].RP > TargetRP) {UpdateStats["Satellite"].TargetRPTime = Trial["Satellite"].Time; SatelliteTargetTimeSet=true;};
+  };
+  UpdateStats["Satellite"].HighestRP = Trial["Satellite"].RP;
+  UpdateStats["Satellite"].HighestRPTime = Trial["Satellite"].Time;
+  if (SatelliteTargetTimeSet == false) {UpdateStats["Satellite"].TargetRPTime = Infinity;};
+
+  Object.entries(UpdateStats).forEach(Station =>{
+    let StationName = Station[0];
+    Object.entries(Station[1]).forEach(Data =>{
+      let TextElement = document.getElementById(`${StationName}${Data[0]}`);
+      if (TextElement != null && TextIndex[Data[0]] != null) {
+        TextElement.innerHTML = `<span class="${TextIndex[Data[0]][0]}">${Intl.NumberFormat("en-UK").format(Data[1])}${TextIndex[Data[0]][1]}</span>`;
       };
     });
   });
 };
+Update();
 
-function UpdateIcons() {
-  if (Selected[CurrentMode].length > 0) {
-    Items.forEach(Item => {
-      Item.className="DeselectedButton";
-    });
-    Selected[CurrentMode].forEach(SelectedItem => {
-      SelectedItem.className="SelectedButton"
-    });
-  } else {
-    Items.forEach(Item => {
-      Item.className="DeselectedButton";
-    });
+var StationItemSelection = {Name:"", Item:""};
+var ItemMenu = document.getElementById("ItemMenu");
+ItemMenu.addEventListener("click", function(event) {
+  const Menu = document.getElementById("ItemBox");
+  if (Menu && !Menu.contains(event.target)) {
+    ItemMenu.style.display = "none";
+    StationItemSelection.Name = "";
+    StationItemSelection.Item = "";
   };
-};
-
-//Item Clicked
-var CurrentMode = "";
-var ModesToDisable = {
-  "RS2":["RS3Mode","RS3BothMode"],
-  "RS3":["RS2Mode","RS3BothMode"],
-  "RS3Both":["RS2Mode","RS3Mode"]
-};
-
-function SetMode(Mode) {
-  if (document.getElementById(Mode+"Mode").className == "SelectionDisabled") {
-    document.getElementById(Mode+"Mode").className = "SelectionEnabled";
-    CurrentMode = Mode;
-    Array.from(ModesToDisable[Mode]).forEach(ModeToDisable => {
-      document.getElementById(ModeToDisable).className = "SelectionDisabled"
-    });
-    UpdateIcons();
-    Update();
-  };
-};
-SetMode("RS3");
-SetMode("RS2");
-
+});
+function SelectStationItem(Name, Item) {
+  ItemMenu.style.display = "";
+  StationItemSelection.Name = Name;
+  StationItemSelection.Item = Item;
+}
 function ItemClicked(Button) {
-  if (Button.className == "DeselectedButton") {
-    if (CurrentMode == "RS2" || CurrentMode == "RS3Both") {
-      if (Selected[CurrentMode].length > 0) {
-        Selected[CurrentMode][0].className = "DeselectedButton";
-        Selected[CurrentMode] = [];
-      };
-      Selected[CurrentMode].push(Button);
-    } else if (CurrentMode == "RS3") {
-      if (Selected[CurrentMode].length >= 2) {
-        Selected[CurrentMode][0].className = "DeselectedButton";
-        Selected[CurrentMode].splice(0, 1);
-      };
-      Selected[CurrentMode].push(Button);
-    };
-    Button.className = "SelectedButton";
-
-  } else if (Button.className == "SelectedButton") {
-    Button.className = "DeselectedButton";
-    Selected[CurrentMode].forEach(function (Item, Index) {
-      if (Item == Button) {
-        Selected[CurrentMode].splice(Index, 1);
-      };
-    });
-  };
-  
+  ItemMenu.style.display = "none";
+  if (StationItemSelection.Name == "" || StationItemSelection.Item == "") {return;};
+  CurrentStations[StationItemSelection.Name][StationItemSelection.Item] = Button.value;
+  document.getElementById(`${StationItemSelection.Name}:${StationItemSelection.Item}`).innerText = Button.value;
+  StationItemSelection.Name = "";
+  StationItemSelection.Item = "";
   Update();
 };
 
-function FluidClicked(Button) {
-  if (Button.className == "DeselectedButton") {
-    if (Selected["SatelliteController"].length > 0) {
-      Selected["SatelliteController"][0].className = "DeselectedButton";
-       Selected["SatelliteController"] = [];
-    };
-    Selected["SatelliteController"].push(Button);
-    Button.className = "SelectedButton";
-
-  } else if (Button.className == "SelectedButton") {
-    Button.className = "DeselectedButton";
-    Selected["SatelliteController"].forEach(function (Item, Index) {
-      if (Item == Button) {
-        Selected["SatelliteController"].splice(Index, 1);
-      };
-    });
-  };
-  Update()
-};
-
-function DeselectAllItems() {
-  Selected[CurrentMode] = [];
-  Items.forEach(Item => {
-    Item.className = "DeselectedButton";
+document.getElementById("ClearStations").onclick = function() {ClearStations(); Update();};
+function ClearStations() {
+  CurrentStations = {};
+  Object.entries(ResearchStationButtons.children).forEach(Button =>{
+    Button[1].remove();
   });
-  Update();
 };
 
-function DeselectAllFluids() {
-  Selected["SatelliteController"] = [];
-  Fluids.forEach(Fluid => {
-    Fluid.className = "DeselectedButton";
+//////////////////////////////////////////////////////////////
+//Import Export
+document.getElementById("ImportData").onclick = function() {document.getElementById("ImportMenu").style.display = "";};
+document.getElementById("ExportData").onclick = function() {ExportClicked();};
+document.getElementById("Import").onclick = function() {ImportClicked();};
+var DataInput = document.getElementById("ImportDataInput");
+
+document.getElementById("ImportMenu").addEventListener("click", function(event) {
+  const Menu = document.getElementById("ImportBox");
+  if (Menu && !Menu.contains(event.target)) {document.getElementById("ImportMenu").style.display = "none";};
+});
+
+function ImportClicked() {
+  try {
+    let Data = DataInput.value.split("🔬");
+    let ExtractedData = {};
+
+    ClearStations();
+
+    Data.forEach(StationToImport => {
+      if (StationToImport == "") {return;};
+      let CurrentStation = JSON.parse(StationToImport);
+      let Name = CurrentStation[0];
+      let StationValues = CurrentStation[1];
+      if (StationValues.Station == null) {return;};
+      if (StationValues.Amount == null) {StationValues.Amount = 0;};
+      if (RPValues[StationValues.Item1] == null) {StationValues.Item1 = null;};
+      if (RPValues[StationValues.Item2] == null) {StationValues.Item2 = null;};
+      ExtractedData[Name] = {Station:StationValues.Station,Amount:StationValues.Amount, "Item1":StationValues.Item1==null?"":StationValues.Item1, "Item2":StationValues.Item2==null?"":StationValues.Item2};
+      AddStation(StationValues.Station, StationValues.Amount, StationValues.Item1, StationValues.Item2, Name);
+    });
+
+    CurrentStations = ExtractedData;
+    document.getElementById('ImportMenu').style.display = 'none';
+    Update();
+
+  } catch {
+    DataInput.value = "Invalid, Try exporting to see format!";
+  };
+};
+
+function ExportClicked() {
+  let ExportText = "";
+  Object.entries(CurrentStations).forEach(function(Data){
+    ExportText += `${JSON.stringify(Data)}🔬\n`;
   });
-  Update();
-
+  navigator.clipboard.writeText(ExportText);
+  document.getElementById("ExportData").innerText = "Copied to clipboard!";
+  setTimeout(_ => {
+  document.getElementById("ExportData").innerText = "Export Data";
+  }, 2000);
 };
 
-
-
-
-
+//////////////////////////////////////////////////////////////
