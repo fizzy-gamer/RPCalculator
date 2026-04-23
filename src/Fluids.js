@@ -1,3 +1,5 @@
+//This is probably going to remain unused but I'm keeping it here for the cools
+
 export const FluidNames = [
     "Ammonia",
     "Leaded Gasoline",
