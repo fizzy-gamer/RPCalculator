@@ -11,15 +11,8 @@ body {
 }
 
 @media (max-width: 600px) {
-  .settings {
-    min-width: fit-content;
-    padding: 2% 10%;
-  }
   .footer {
     font-size: 14px;
-  }
-  h1 {
-    font-size: 5vw;
   }
 }
 
@@ -36,7 +29,10 @@ body {
 }
 
 .Menu,
-.ResearchStation {
+.SettingsMenu,
+.ResearchStation,
+.ImportMenu,
+.ItemMenu {
   background:linear-gradient(45deg,#121e44,#084139);
   box-shadow:0 6px 24px rgba(0,0,0,0.6);
   margin: 16px;
@@ -57,7 +53,11 @@ body {
   flex-direction: row;
   text-align: center;
   gap: 20px;
-  min-width: 30%;
+  min-width: 40%;
+}
+.SettingsMenu {
+  gap: 20px;
+  min-width: 40%;
 }
 .OptionButtons {
   display: flex;
@@ -69,8 +69,7 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
-.SelectionEnabled,
-.SelectionDisabled {
+.ControlButton, .StationItem, .ImportButton {
   font-family: "Fredoka One";
   margin: 5px;
   border-radius: 25px;
@@ -78,19 +77,19 @@ body {
   border-color: black;
   border-style: solid;
 }
-.SelectionDisabled {
-  background:linear-gradient(45deg,#121e44,#084139);
+.StationItem {
+  min-width: 75%;
+  min-height: 10%;
+  font-size: 90%;
 }
-
-.Buttons {
+.Buttons,.ItemButtons {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(64px, 128px));
+  grid-template-columns: repeat(auto-fit, minmax(128px, 128px));
   gap: 5px;
   width: 100%;
   justify-content: space-evenly;
 }
-.DeselectedButton,
-.SelectedButton {
+.StationButton,.Station,.ItemButton {
   height: 128px;
   width: 128px;
   font-family: "Fredoka One";
@@ -104,17 +103,13 @@ body {
   flex-direction: column;
   border-style: solid;
 }
-.DeselectedButton {
- border-color: #cd1c18;
+.StationButton {
+  border-color: #16ac98;
+  height: 140px;
 }
-.SelectedButton {
-  border-color: #7CFC00;
-}
-.ItemIcon {
-  width: auto;
-  max-width: 64px;
-  height: auto;
-  max-height: 64px;
+.Station {
+  border-color: #16ac98;
+  height: 200px;
 }
 
 .ResearchStationImage {
@@ -123,10 +118,23 @@ body {
   height: fit-content;
   max-height: 260px;
 }
+.ResearchStationIcon {
+  width: fit-content;
+  max-width: 60px;
+  height: fit-content;
+  max-height: 52px;
+}
+.ItemIcon {
+  width: fit-content;
+  max-width: 64px;
+  height: fit-content;
+  max-height: 64px;
+}
+
+.OverlayInput,
 .AmountInput {
   font-family: "Fredoka One";
-  width: fit-content;
-  min-width: 50%;
+  max-width: 80%;
   margin: 5px;
   margin-left: auto;
   margin-right: auto;
@@ -136,6 +144,18 @@ body {
   border-style: solid;
   border-radius: 10px;
   color:rgb(175, 175, 175);
+}
+
+.RPText{background:linear-gradient(to bottom,#00ffff,#009999);}
+.OrangeText{background:linear-gradient(to bottom,#ffa500,#b37400);}
+.RedText{background:linear-gradient(to bottom,#ff3c00,#d43200);}
+.GreenText{background:linear-gradient(to bottom,#00ff00,#008f00);}
+.GreyText{background:linear-gradient(to bottom,#858585,#b6b6b6);}
+.YellowText{background:linear-gradient(to bottom, #ecff00, #abb800);}
+.RPText,.OrangeText,.RedText,.GreenText,.GreyText,.YellowText {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .RateTexts {
   margin: 5px;
@@ -147,15 +167,43 @@ body {
   color:grey;
 }
 
-.RPText{background:linear-gradient(to bottom,#00ffff,#009999);}
-.OrangeText{background:linear-gradient(to bottom,#ffa500,#b37400);}
-.RedText{background:linear-gradient(to bottom,#ff3c00,#d43200);}
-.MoneyText{background:linear-gradient(to bottom,#00ff00,#008f00);}
-.GreyText{background:linear-gradient(to bottom,#858585,#b6b6b6);}
-.RPText,.OrangeText,.RedText,.MoneyText,.GreyText{
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.OverlayInput {
+  font-size: 20px;
+  min-width: 80%;
+  min-height: 40px;
+}
+.ImportButton {
+  font-size: 20px;
+  min-width: 80%;
+  min-height: 40px;
+  border-radius: 10px;
+}
+.ImportMenu {
+  min-width: 40%;
+  min-height: 20%;
+}
+.ItemMenu {
+  min-width: 70%;
+  max-width: 70%;
+  min-height: 80%;
+  max-height: 80%;
+}
+.ItemButtons {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.Backing {
+  min-width: 100%;
+  min-height: 100%;
+  background: #00000080;
+  position: fixed;
+  z-index: 1000;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  border: none;
+  grid-template-columns: 100%;
 }
 
 .Footer {
