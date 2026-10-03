@@ -11,4 +11,4 @@ Made by [Fizzy](https://github.com/fizzy-gamer)
 
 # License
 
-Code is licensed under the AGPL-3.0 license<br>
+No License Granted, All Rights Reserved
