@@ -28,9 +28,11 @@ body {
   max-width: 250px;
 }
 
+.KeyInfo,
 .Menu,
 .SettingsMenu,
 .ResearchStation,
+.ResearchStationInfo,
 .ImportMenu,
 .ItemMenu {
   background:linear-gradient(45deg,#121e44,#084139);
@@ -45,18 +47,42 @@ body {
   display: flex;
   flex-direction: column;
   width: fit-content;
-  min-width: 75%;
+  text-align: center;
+}
+.Menu {
+  flex-direction: row;
+  align-items: flex-start;
+  min-width: 80%;
+}
+.ResearchStations {
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 50%;
+  text-align: center;
+}
+.ResearchStationInfo {
+  background: none;
+  box-shadow: none;
+  min-width: 80%;
+  margin-left: 16px;
+  margin-left: 16px;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
 }
 .ResearchStation {
+  margin: 16px;
   align-items: center;
   flex-wrap: wrap;
   flex-direction: row;
-  text-align: center;
-  gap: 20px;
-  min-width: 40%;
+  gap: 10px;
+  min-width: fit-content;
 }
 .SettingsMenu {
-  gap: 20px;
+  background:linear-gradient(45deg,rgba(18, 30, 68,0.25),rgba(8, 65, 57,0.25));
+  margin-left: 0px;
+  margin-left: 0px;
+  gap: 5px;
   min-width: 40%;
 }
 .OptionButtons {
@@ -187,6 +213,7 @@ body {
   max-width: 70%;
   min-height: 80%;
   max-height: 80%;
+  text-align: center;
 }
 .ItemButtons {
   overflow-y: auto;
