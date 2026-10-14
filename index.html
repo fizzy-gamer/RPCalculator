@@ -35,6 +35,45 @@
 
   <body>
   <div class="Rates">
+    <div class="KeyInfo">
+      <div class="RatesText">
+        <h2><u class="OrangeText"> Key info! </u></h2>
+        <div class="GreyText">• Soft Cap is the Efficiency Threshold (when RP/s Starts decreasing)</div>
+        <div class="GreyText">• This calculator will limit Target values to 10M RP (as of now)</div>
+        <div class="GreyText">• "Max RP" is when RP/s drops to 1% of the RP/s at 0RP <b><u>or</u></b> when you reach 10M RP</div>
+        <div class="GreyText">• If you set Target RP Above 10M RP you won't get the time<br>until Target RP (because of the 10M RP lock)</div>
+        <div class="GreyText">• "Infinite Time until Target RP" means you will not reach the Target!</div>
+      </div>
+    </div>
+
+    <div class="Menu">
+      <div class="SettingsMenu">
+        <h2>⚠️<u class="YellowText"> Configure </u>⚠️</h2>
+        <input id="CurrentRP" class="AmountInput" placeholder="Current RP" type="number" step="1" min="0">
+        <input id="TargetRP"  class="AmountInput" placeholder="Target RP"  type="number" step="1" min="0">
+        <div class="OptionButtons">
+          <button class="ControlButton" id="ClearStations">Clear Stations</button>
+          <button class="ControlButton" id="ExportData">Export Data</button>
+          <button class="ControlButton" id="ImportData">Import Data</button>
+        </div>
+        <div class="Buttons">
+          <button class="StationButton" id="RS1" value="Research Station1"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/7/74/Research_Station1.png"><p class="GreenText">Add Research Station1</p></button>
+          <button class="StationButton" id="RS2" value="Research Station2"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/a/a8/Research_Station2.png"><p class="GreenText">Add Research Station2</p></button>
+          <button class="StationButton" id="RS3" value="Research Station3"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/4/4a/Research_Station3.png"><p class="GreenText">Add Research Station3</p></button>
+          <button class="StationButton" id="RS4" value="Research Station4"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/f/f4/Research_Station4.png"><p class="GreenText">Add Research Station4</p></button>
+          <button class="StationButton" id="Satellite" value="Satellite Controler"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/b/b8/Satellite_Dish_Controller.png"><p class="GreenText">Add Sattelite Controller</p></button>
+        </div>
+      </div>
+
+      <div class="ResearchStations">
+        <h2><u class="OrangeText">Current Research Stations</u></h2>
+        <div class="Buttons" id="ResearchStations"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="ResearchStationInfo">
     <div class="ResearchStation">
       <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/7/74/Research_Station1.png">
       <div class="RatesText">
@@ -53,7 +92,7 @@
       <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/a/a8/Research_Station2.png">
       <div class="RatesText">
         <h2>⚙️<u class="GreyText"> Research Station2 Rates </u>⚙️</h2>
-        <div class="RateTexts" id="RS2BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS2BaseRPs"></div>
         <div class="RateTexts" id="RS2CurrentRPs"></div>
         <div class="RateTexts" id="RS2RPCap"></div>
         <div class="RateTexts" id="RS2HighestRP"></div>
@@ -68,7 +107,7 @@
       <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/4/4a/Research_Station3.png">
       <div class="RatesText">
         <h2>⚙️<u class="GreyText"> Research Station3 Rates </u>⚙️</h2>
-        <div class="RateTexts" id="RS3BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS3BaseRPs"></div>
         <div class="RateTexts" id="RS3CurrentRPs"></div>
         <div class="RateTexts" id="RS3RPCap"></div>
         <div class="RateTexts" id="RS3HighestRP"></div>
@@ -76,7 +115,7 @@
         <div class="RateTexts" id="RS3TargetRPTime"></div>
         <div class="RateTexts" id="RS3Usage"></div>
         <div class="RateTexts" id="RS3PowerMMF"></div>
-        <div class="RedText"  id="RS3DoubleItems"></div>
+        <div class="RedText"   id="RS3DoubleItems"></div>
       </div>
     </div>
 
@@ -84,7 +123,7 @@
       <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/f/f4/Research_Station4.png">
       <div class="RatesText">
         <h2>⚙️<u class="GreyText"> Research Station4 Rates </u>⚙️</h2>
-        <div class="RateTexts" id="RS4BaseRPs">If u see dis then update function didnt run for some reason</div>
+        <div class="RateTexts" id="RS4BaseRPs"></div>
         <div class="RateTexts" id="RS4BuffRPs"></div>
         <div class="RateTexts" id="RS4CurrentRPs"></div>
         <div class="RateTexts" id="RS4RPCap"></div>
@@ -94,7 +133,8 @@
         <div class="RateTexts" id="RS4Usage"></div>
         <div class="RateTexts" id="RS4PowerMMF"></div>
         <div class="YellowText">RS4 is calculated as if it already has an RS3!</div>
-        <div class="RedText">RS4 RP/s logic buff assumes the circuit runs every tick!</div>
+        <div class="RedText">RS4 assumes the minigame is done at<br>least once every 6 ticks!</div>
+        <div class="RedText"   id="RS4DoubleItems"></div>
       </div>
     </div>
     
@@ -102,41 +142,20 @@
       <img class="ResearchStationImage" src="https://static.wikitide.net/industrialistwiki/b/b8/Satellite_Dish_Controller.png">
       <div class="RatesText">
         <h2>⚙️<u class="GreyText"> Satelite Controller Rates </u>⚙️</h2>
-        <div class="RateTexts"  id="SatellitePercentBoost">If u see dis then update function didnt run for some reason</div>
+        <div class="YellowText">At 100% Efficency:</div>
+        <div class="RateTexts"  id="SatellitePercentBoost"></div>
         <div class="RateTexts"  id="SatelliteBaseRPsBoost"></div>
         <div class="RateTexts"  id="SatelliteCurrentRPsBoost"></div>
+        <div class="RateTexts"  id="SatelliteDishesRequired"></div>
         <div class="RateTexts"  id="SatelliteHighestRP"></div>
         <div class="RateTexts"  id="SatelliteHighestRPTime"></div>
         <div class="RateTexts"  id="SatelliteTargetRPTime"></div>
-        <div class="RateTexts"  id="SatelliteDishesRequired"></div>
         <div class="OrangeText" id="SatelliteSatelliteUsage"></div>
         <div class="RateTexts"  id="SatellitePowerSatellite"></div>
         <div class="YellowText">These stats are also combined rates for all Stations!</div>
       </div>
     </div>
   </div>
-
-  <div class="SettingsMenu">
-      <h2>⚠️<u class="YellowText"> Configure </u>⚠️</h2>
-      <input id="CurrentRP" class="AmountInput" placeholder="Current RP" type="number" step="1" min="0">
-      <input id="TargetRP"  class="AmountInput" placeholder="Target RP"  type="number" step="1" min="0">
-      <div class="OptionButtons">
-        <button class="ControlButton" id="ClearStations">Clear Stations</button>
-        <button class="ControlButton" id="ExportData">Export Data</button>
-        <button class="ControlButton" id="ImportData">Import Data</button>
-      </div>
-      <div class="Buttons">
-        <button class="StationButton" id="RS1" value="Research Station1"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/7/74/Research_Station1.png"><p class="GreenText">Add Research Station1</p></button>
-        <button class="StationButton" id="RS2" value="Research Station2"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/a/a8/Research_Station2.png"><p class="GreenText">Add Research Station2</p></button>
-        <button class="StationButton" id="RS3" value="Research Station3"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/4/4a/Research_Station3.png"><p class="GreenText">Add Research Station3</p></button>
-        <button class="StationButton" id="RS4" value="Research Station4"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/f/f4/Research_Station4.png"><p class="GreenText">Add Research Station4</p></button>
-        <button class="StationButton" id="Satellite" value="Satellite Controler"><img class="ResearchStationIcon" src="https://static.wikitide.net/industrialistwiki/b/b8/Satellite_Dish_Controller.png"><p class="GreenText">Add Sattelite Controller</p></button>
-      </div>
-  </div>
-
-  <div class="Menu">
-    <h2><u class="OrangeText">Current Research Stations</u></h2>
-    <div class="Buttons" id="ResearchStations"></div>
   </div>
   
   <p class="Footer">
