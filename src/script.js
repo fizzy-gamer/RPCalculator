@@ -50,7 +50,7 @@ function AddStation(Type, Amount, Item1, Item2, CurrentName) {
   AmountInput.step = "1";
   AmountInput.min = "0";
   if (Amount != 0) {AmountInput.value = Amount;};
-  AmountInput.addEventListener("input", function(){CurrentStations[Name].Amount = (parseFloat(AmountInput.value) == NaN) ? 0: parseFloat(AmountInput.value); Update();});
+  AmountInput.addEventListener("focusout", function(){CurrentStations[Name].Amount = (parseFloat(AmountInput.value) == NaN) ? 0: parseFloat(AmountInput.value); Update();});
   Station.appendChild(AmountInput);
 
   if (Type.indexOf("2") >-1 || Type.indexOf("3") >-1 || Type.indexOf("4") >-1 || Type.indexOf("Satellite") >-1) {
@@ -83,8 +83,8 @@ document.getElementById("Satellite").onclick = function() {AddStation("Satellite
 
 var CurrentRPInput = document.getElementById("CurrentRP");
 var TargetRPInput = document.getElementById("TargetRP");
-CurrentRPInput.addEventListener("input", function() {Update();});
-TargetRPInput.addEventListener("input", function() {Update();});
+CurrentRPInput.addEventListener("focusout", function() {Update();});
+TargetRPInput.addEventListener("focusout", function() {Update();});
 
 //Sort
 var Items = ItemButtons.children;
@@ -107,10 +107,6 @@ function SearchFilter() {
 ItemSearchInput.onkeyup = function() {SearchFilter();};
 
 //Mathz
-function Round2DP(Number){
-  return Math.round(Number*100)/100;
-};
-
 function CustomLog(Number,Base) {
   let Calculated = (Math.log(Number) / Math.log(Base))
   return Calculated == -Infinity ? 0 : Calculated;
@@ -120,23 +116,30 @@ function MathClamp(Number, Min, Max) {
   return Math.max(Min, Math.min(Number, Max));
 };
 
+function Round2DP(Num) {
+  return (Math.round(Num*100))/100
+};
+function SecondsToMinsText(Seconds) {
+  return `${Round2DP(Seconds)}s (${Round2DP(Seconds/60)} mins)`
+};
+
 var TextIndex = {
-  "RPCap":          ["RPText", "RP Cap"],
+  "RPCap":          ["RPText", "RP Soft Cap"],
   "BaseRPs" :       ["RPText", "RP/s - Original"],
   "CurrentRPs" :    ["RPText", "RP/s - Current"],
-  "BuffRPs" :       ["RPText", "RP/s - When Minigame"],
-  "BaseRPsBoost" :  ["RPText", "RP/s Boost (at 100% Efficiency) - Original"],
-  "CurrentRPsBoost":["RPText", "RP/s Boost (at 100% Efficiency) - Current"],
-  "HighestRP":      ["GreyText", "RP when RP/s is 1% of original or 10M RP"],
-  "HighestRPTime":  ["GreyText", " seconds until RP/s is 1% of original or 10M RP"],
-  "TargetRPTime":   ["GreyText", " seconds until Target RP is reached"],
+  "BuffRPs" :       ["RPText", "RP/s - Minigame Boost"],
+  "BaseRPsBoost" :  ["RPText", "RP/s Boost - Original"],
+  "CurrentRPsBoost":["RPText", "RP/s Boost - Current"],
+  "HighestRP":      ["GreyText", " Max RP"],
+  "HighestRPTime":  ["GreyText", " until Max RP"],
+  "TargetRPTime":   ["GreyText", " until Target RP"],
   "Usage":          ["OrangeText", "u/s of the Item(s) required!"],
   "PowerKMF":       ["OrangeText", "KMF/s required!"],
   "PowerMMF":       ["OrangeText", "MMF/s required!"],
-  "PercentBoost" :  ["RPText", "% Boost (at 100% Efficiency)"],
+  "PercentBoost" :  ["RPText", "% Boost"],
   "PowerSatellite": ["OrangeText", "KMF/s required for both Satellite Controllers and Dishes!"],
-  "SatelliteUsage": ["OrangeText", "L/s of the Liquid required!"],
-  "DishesRequired": ["RPText"," Satellite Dishes required for 100% Efficiency!"]
+  "SatelliteUsage": ["OrangeText", "L/s of the Liquid(s) required!"],
+  "DishesRequired": ["RPText"," Satellite Dishes <u>required</u> for 100% Efficiency!"]
 };
 
 function CalculateCap(Teir, Amount) {
@@ -174,8 +177,8 @@ function Update() {
   let UpdateStats = {
     "RS1":{"Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerKMF":0},
     "RS2":{"Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerKMF":0, "Usage":0},
-    "RS3":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "Double":false},
-    "RS4":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "BuffRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "Double":false},
+    "RS3":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "DoubleItems":false},
+    "RS4":{"RawAmount":0, "Amount":0, "TotalRPValue":0, "BaseRPs":0, "CurrentRPs":0, "BuffRPs":0, "RPCap":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerMMF":0, "Usage":0, "DoubleItems":false},
     "Satellite":{"Amount":0, "TotalRPValue":0, "PercentBoost":0, "BaseRPsBoost":0, "CurrentRPsBoost":0, "HighestRP":0, "HighestRPTime":0, "TargetRPTime":0, "PowerSatellite":0, "SatelliteUsage":0, "DishesRequired":0}
   };
   Object.entries(CurrentStations).forEach(Station => {
@@ -191,7 +194,7 @@ function Update() {
       if (Station[1].Station == "RS4") {MoneyBuff *=2;}; //Logic Buff
 
       let TotalRP = (RPValues[Station[1].Item1]==null ?0 :RPValues[Station[1].Item1]) + (RPValues[Station[1].Item2]==null ?0 :RPValues[Station[1].Item2]);
-      if (Station[1].Item1 == Station[1].Item2) {TotalRP *= 0.7; UpdateStats[Station[1].Station].Double = true;};
+      if (Station[1].Item1 == Station[1].Item2) {TotalRP *= 0.7; UpdateStats[Station[1].Station].DoubleItems = true;};
 
       UpdateStats[Station[1].Station].Amount += MoneyBuff * Station[1].Amount;
       UpdateStats[Station[1].Station].RawAmount += Station[1].Amount
@@ -206,7 +209,6 @@ function Update() {
     UpdateStats[`RS${i}`].BaseRPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, 0);
     UpdateStats[`RS${i}`].CurrentRPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, CurrentRP);
   };
-  UpdateStats["RS4"].BuffRPs = CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount);
   UpdateStats["RS2"].Usage = UpdateStats["RS2"].Amount * 0.5;
   UpdateStats["RS3"].Usage = UpdateStats["RS3"].RawAmount * 0.2;
   UpdateStats["RS4"].Usage = UpdateStats["RS4"].RawAmount * 0.2;
@@ -221,6 +223,7 @@ function Update() {
   UpdateStats["Satellite"].CurrentRPsBoost = (UpdateStats["RS1"].CurrentRPs +UpdateStats["RS2"].CurrentRPs +UpdateStats["RS3"].CurrentRPs +UpdateStats["RS4"].CurrentRPs +(CurrentRP < UpdateStats["RS4"].RPCap ?CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount) :0)) * ((UpdateStats["Satellite"].PercentBoost/100)+1)
   UpdateStats["Satellite"].SatelliteUsage = UpdateStats["Satellite"].Amount * 0.5;
   UpdateStats["Satellite"].PowerSatellite = (UpdateStats["Satellite"].Amount *75) + (UpdateStats["Satellite"].DishesRequired *75);
+  UpdateStats["Satellite"].DishesRequired = `${Round2DP(UpdateStats["Satellite"].DishesRequired)} (${Math.ceil(UpdateStats["Satellite"].DishesRequired)})`
 
   let Trial = {
     "RS1":{"Min":UpdateStats["RS1"].BaseRPs*0.01, "RPs":UpdateStats["RS1"].CurrentRPs, "RP":CurrentRP, "Time":0},
@@ -237,7 +240,7 @@ function Update() {
       Trial[`RS${i}`].RPs = CalculateRPs(i, UpdateStats[`RS${i}`].Amount, UpdateStats[`RS${i}`].TotalRPValue, UpdateStats[`RS${i}`].RPCap, Trial[`RS${i}`].RP);
       Trial[`RS${i}`].RP += Trial[`RS${i}`].RPs;
       Trial[`RS${i}`].Time += 1;
-      if (TargetTimeSet == false && Trial[`RS${i}`].RP > TargetRP) {UpdateStats[`RS${i}`].TargetRPTime = Trial[`RS${i}`].Time; TargetTimeSet=true;};
+      if (TargetTimeSet == false && Trial[`RS${i}`].RP >= TargetRP) {UpdateStats[`RS${i}`].TargetRPTime = Trial[`RS${i}`].Time; TargetTimeSet=true;};
     };
     UpdateStats[`RS${i}`].HighestRP = Trial[`RS${i}`].RP;
     UpdateStats[`RS${i}`].HighestRPTime = Trial[`RS${i}`].Time;
@@ -245,12 +248,14 @@ function Update() {
   };
   //RS4 Highest RP & Target Time
   let RS4Buff = CalculateRS4Buff(UpdateStats["RS4"].RPCap, UpdateStats["RS4"].RawAmount);
+  UpdateStats["RS4"].BuffRPs = RS4Buff;
+  UpdateStats["RS4"].CurrentRPs += (CurrentRP < UpdateStats["RS4"].RPCap ?RS4Buff :0);
   let RS4TargetTimeSet = false;
   while (Trial["RS4"].RPs > Trial["RS4"].Min && Trial["RS4"].RPs > 0 && Trial["RS4"].RP < 10000000) {
     Trial["RS4"].RPs = CalculateRPs(4, UpdateStats["RS4"].Amount, UpdateStats["RS4"].TotalRPValue, UpdateStats["RS4"].RPCap, Trial["RS4"].RP);
     Trial["RS4"].RP += Trial["RS4"].RPs + (Trial["RS4"].RP < UpdateStats["RS4"].RPCap ?RS4Buff :0);
     Trial["RS4"].Time += 1;
-    if (RS4TargetTimeSet == false && Trial["RS4"].RP > TargetRP) {UpdateStats["RS4"].TargetRPTime = Trial["RS4"].Time; RS4TargetTimeSet=true;};
+    if (RS4TargetTimeSet == false && Trial["RS4"].RP >= TargetRP) {UpdateStats["RS4"].TargetRPTime = Trial["RS4"].Time; RS4TargetTimeSet=true;};
   };
   UpdateStats["RS4"].HighestRP = Trial["RS4"].RP;
   UpdateStats["RS4"].HighestRPTime = Trial["RS4"].Time;
@@ -273,11 +278,23 @@ function Update() {
   if (SatelliteTargetTimeSet == false) {UpdateStats["Satellite"].TargetRPTime = Infinity;};
 
   Object.entries(UpdateStats).forEach(Station =>{
+    Station[1].HighestRPTime = SecondsToMinsText(Station[1].HighestRPTime);
+    Station[1].TargetRPTime = Station[1].TargetRPTime == Infinity? "Infinite Time" :SecondsToMinsText(Station[1].TargetRPTime);
+    if (Station[0] == "RS3" || Station[0] == "RS4") {
+      let TextElement = document.getElementById(`${Station[0]}DoubleItems`);
+      TextElement.innerHTML = Station[1].DoubleItems == false ? "" : `Some ${Station[0]}s are suffering a 30% Cap Loss<br>from using the same item!`
+    };
+  });
+
+  Object.entries(UpdateStats).forEach(Station =>{
     let StationName = Station[0];
     Object.entries(Station[1]).forEach(Data =>{
       let TextElement = document.getElementById(`${StationName}${Data[0]}`);
       if (TextElement != null && TextIndex[Data[0]] != null) {
-        TextElement.innerHTML = `<span class="${TextIndex[Data[0]][0]}">${Intl.NumberFormat("en-UK").format(Data[1])}${TextIndex[Data[0]][1]}</span>`;
+        TextElement.innerHTML = `<span class="
+          ${TextIndex[Data[0]][0]}">
+          ${isNaN(Data[1]) == true ? Data[1] : Intl.NumberFormat("en-UK").format(Data[1])}${TextIndex[Data[0]][1]}
+        </span>`;
       };
     });
   });
